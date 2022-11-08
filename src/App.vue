@@ -180,7 +180,6 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
           <div class="dientifier">{{ item["学号"] }}</div>
         </div>
       </div>
-      <div class="copright">Powered By@郑人滏</div>
     </div>
     <div class="right">
       <div class="datasource">
@@ -343,15 +342,6 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
   box-sizing: border-box;
   height: 10%;
   text-align: center;
-}
-
-.copright {
-  height: 3%;
-  text-align: center;
-  font-size: 13px;
-  color: #9a9999;
-  box-sizing: border-box;
-  padding-bottom: 6px;
 }
 
 .random {

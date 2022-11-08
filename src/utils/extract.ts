@@ -36,7 +36,6 @@ export class Extract {
         });
       }
     }
-    // console.log(rans);
   }
 
   public random(): any {
