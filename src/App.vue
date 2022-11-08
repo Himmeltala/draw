@@ -184,7 +184,12 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
     </div>
     <div class="right">
       <div class="datasource">
-        <h3>数据管理</h3>
+        <h3>
+          <span>数据管理</span>
+          <el-tooltip class="tooltip" effect="dark" content="遇到问题？点击查看文档" placement="top-start">
+            <el-link href="https://gitee.com/Enziandom/gadget-webrandom#%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E" class="mg-l-10" target="_blank">遇到问题</el-link>
+          </el-tooltip>
+        </h3>
         <el-upload ref="upload" :limit="1" :on-change="onChange" :on-exceed="handleExceed" :auto-upload="false">
           <template #trigger>
             <el-button class="mg-r-10" plain type="primary" :icon="Upload">上传文件</el-button>
@@ -307,6 +312,10 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
+}
+
+.tooltip {
+  cursor: pointer;
 }
 
 .edit-title {
