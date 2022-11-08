@@ -1,0 +1,53 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+}
+
+:root,
+#app,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.mg-lr-5 {
+  margin: 0 5px;
+}
+
+.mg-lr-10 {
+  margin: 0 10px;
+}
+
+.mg-l-5 {
+  margin-left: 5px;
+}
+
+.mg-l-10 {
+  margin-left: 10px;
+}
+
+.mg-r-5 {
+  margin-right: 5px;
+}
+
+.mg-r-10 {
+  margin-right: 10px;
+}
+
+.text-red {
+  color: #f56c6c;
+}
+
+.text-align-right {
+  text-align: right;
+}
+
+.text-align-left {
+  text-align: left;
+}
+
+.text-align-center {
+  text-align: center;
+}
