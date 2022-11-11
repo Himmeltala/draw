@@ -6,7 +6,7 @@ import type { UploadInstance, UploadProps, UploadRawFile, FormRules, FormInstanc
 import { Search, Upload, Delete, Minus, Download, Close, SuccessFilled } from "@element-plus/icons-vue";
 import { importXlsx, exportXlsx, FileType } from "./utils/xlsx";
 import { Extract } from "./utils/extract";
-import { canvasApp } from "./utils/draw_canvas";
+import { CanvasApp } from "./utils/draw_canvas";
 
 let xlsx = useStorage<any>("xlsx-data", []);
 let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
@@ -31,7 +31,9 @@ onMounted(() => {
   canvas.value.height = stage.value.clientHeight;
   canvas.value.width = stage.value.clientWidth;
 
-  canvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
+  let c = new CanvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
+  c.create();
+  c.init();
 });
 
 const upload = ref<UploadInstance>();
