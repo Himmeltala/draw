@@ -20,7 +20,7 @@ function inspectData(xlsx: any) {
 const stage = ref<any>(null);
 const canvas = ref<any>(null);
 let canvasApp = new CanvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
-let speed = ref(0.3);
+let speed = ref(1);
 
 onMounted(() => {
   inspectData(xlsx.value);
@@ -92,24 +92,20 @@ let interval = 0;
 let stochastic = ref<any[]>([]);
 
 const start = async (formEl: FormInstance | undefined) => {
-  // if (!formEl) return;
-  // await formEl.validate((valid, fields) => {
-  //   if (valid) {
-  //     interval = setInterval(() => {
-  //       stochastic.value = [];
-  //       for (let i = 0; i < configFormData.max; i++) stochastic.value.push(xlsx.value[Math.floor(Math.random() * xlsx.value.length)]);
-  //     }, configFormData.rate);
-  //     disabledStart.value = true;
-  //     disabledClose.value = false;
-  //   } else ElMessage.error("请确认表单信息填写完整！");
-  // });
-  canvasApp.setSpeed = speed.value;
-  clearInterval(canvasApp.getTimer);
-  canvasApp.setTimer(
-    setInterval(() => {
-      canvasApp.onTimer();
-    }, 10 / 24)
-  );
+  if (!formEl) return;
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      canvasApp.setSpeed = speed.value;
+      clearInterval(canvasApp.getTimer);
+      canvasApp.setTimer = setInterval(() => {
+        canvasApp.onTimer();
+      }, 10 / 24);
+      stochastic.value = [];
+      for (let i = 0; i < configFormData.max; i++) stochastic.value.push(xlsx.value[Math.floor(Math.random() * xlsx.value.length)]);
+      disabledStart.value = true;
+      disabledClose.value = false;
+    } else ElMessage.error("请确认表单信息填写完整！");
+  });
 };
 
 function close() {
@@ -129,6 +125,14 @@ function close() {
       }
     }
   }
+
+  canvasApp.setSpeed = 0.3;
+  clearInterval(canvasApp.getTimer);
+  canvasApp.setTimer = setInterval(() => {
+    canvasApp.onTimer();
+  }, 10 / 24);
+
+  drawDialog.value = !drawDialog.value;
   disabledStart.value = false;
   disabledClose.value = true;
 }
@@ -174,6 +178,8 @@ const exportData = async (formEl: FormInstance | undefined) => {
 
 let isEditedTitle = ref(false);
 let title = useStorage<any>("title", "点击修改本次活动标题");
+
+let drawDialog = ref(false);
 </script>
 
 <template>
@@ -199,6 +205,21 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
           <div class="dientifier">{{ item["学号"] }}</div>
         </div> -->
         <canvas id="canvas-2d" ref="canvas" />
+        <el-dialog v-model="drawDialog" title="谁是幸运儿？" width="30%" align-center>
+          <div class="student flex-center flex-items-center flex-wrap flex-row">
+            <div v-for="(item, index) in stochastic" :key="index" :style="{ 'font-size': configFormData.size + 'px', width: configFormData.size * 9 + 'px', height: configFormData.size * 9 + 'px' }">
+              <Avatar />
+              <div class="compellation">{{ item["姓名"] }}</div>
+              <div class="dientifier">{{ item["学号"] }}</div>
+            </div>
+          </div>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="drawDialog = false">取消</el-button>
+              <el-button type="primary" @click="drawDialog = false">再来</el-button>
+            </span>
+          </template>
+        </el-dialog>
       </div>
     </div>
     <div class="sidebar">
@@ -367,13 +388,14 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
 }
 
 .student {
-  width: 110px;
-  height: 110px;
+  width: 100%;
   padding: 10px;
   box-sizing: border-box;
 }
 
 .student > div {
+  width: 110px !important;
+  height: 110px !important;
   text-align: center;
 }
 </style>
