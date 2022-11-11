@@ -6,6 +6,7 @@ import type { UploadInstance, UploadProps, UploadRawFile, FormRules, FormInstanc
 import { Search, Upload, Delete, Minus, Download, Close, SuccessFilled } from "@element-plus/icons-vue";
 import { importXlsx, exportXlsx, FileType } from "./utils/xlsx";
 import { Extract } from "./utils/extract";
+import { canvasApp } from "./utils/draw_canvas";
 
 let xlsx = useStorage<any>("xlsx-data", []);
 let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
@@ -16,6 +17,9 @@ function inspectData(xlsx: any) {
   else tips.value = `<span class="text-red">你没有导入表格，点击上传文件</span>`;
 }
 
+const stage = ref<any>(null);
+const canvas = ref<any>(null);
+
 onMounted(() => {
   inspectData(xlsx.value);
   watch(
@@ -23,6 +27,11 @@ onMounted(() => {
     (newValue, oldValue) => inspectData(newValue),
     { deep: true }
   );
+
+  canvas.value.height = stage.value.clientHeight;
+  canvas.value.width = stage.value.clientWidth;
+
+  canvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
 });
 
 const upload = ref<UploadInstance>();
@@ -169,8 +178,8 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
           <el-button class="mg-l-10" type="success" plain circle :icon="SuccessFilled" @click="isEditedTitle = !isEditedTitle" />
         </h1>
       </template>
-      <div class="stage flex-center flex-items-center flex-wrap">
-        <div
+      <div ref="stage" id="stage" class="stage flex-center flex-items-center flex-wrap">
+        <!-- <div
           v-for="(item, index) in stochastic"
           :key="index"
           class="student flex-center flex-items-center flex-nowrap flex-col"
@@ -178,7 +187,8 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
           <Avatar />
           <div class="compellation">{{ item["姓名"] }}</div>
           <div class="dientifier">{{ item["学号"] }}</div>
-        </div>
+        </div> -->
+        <canvas id="canvas-2d" ref="canvas" />
       </div>
     </div>
     <div class="sidebar">
