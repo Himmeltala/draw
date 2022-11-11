@@ -51,3 +51,34 @@ body {
 .text-align-center {
   text-align: center;
 }
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-items-center {
+  align-content: center;
+  align-items: center;
+}
+
+.flex-space {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}

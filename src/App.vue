@@ -153,35 +153,35 @@ const exportData = async (formEl: FormInstance | undefined) => {
   });
 };
 
-let isEditTitle = ref(false);
+let isEditedTitle = ref(false);
 let title = useStorage<any>("title", "点击修改本次活动标题");
 </script>
 
 <template>
-  <div class="container">
-    <div class="middle">
-      <template v-if="!isEditTitle">
-        <h1 @click="isEditTitle = !isEditTitle">{{ title }}</h1>
+  <div class="container flex-space">
+    <div class="content">
+      <template v-if="!isEditedTitle">
+        <h1 @click="isEditedTitle = !isEditedTitle">{{ title }}</h1>
       </template>
       <template v-else>
-        <h1 class="edit-title">
+        <h1 class="title flex-center flex-items-center">
           <el-input size="large" v-model="title" />
-          <el-button class="mg-l-10" type="success" plain circle :icon="SuccessFilled" @click="isEditTitle = !isEditTitle" />
+          <el-button class="mg-l-10" type="success" plain circle :icon="SuccessFilled" @click="isEditedTitle = !isEditedTitle" />
         </h1>
       </template>
-      <div class="random">
+      <div class="stage flex-center flex-items-center flex-wrap">
         <div
           v-for="(item, index) in stochastic"
           :key="index"
-          class="student"
+          class="student flex-center flex-items-center flex-nowrap flex-col"
           :style="{ 'font-size': configFormData.size + 'px', width: configFormData.size * 9 + 'px', height: configFormData.size * 9 + 'px' }">
           <Avatar />
-          <div class="name">{{ item["姓名"] }}</div>
+          <div class="compellation">{{ item["姓名"] }}</div>
           <div class="dientifier">{{ item["学号"] }}</div>
         </div>
       </div>
     </div>
-    <div class="right">
+    <div class="sidebar">
       <div class="datasource">
         <h3>
           <span>数据管理</span>
@@ -197,7 +197,7 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
             <div class="el-upload__tip" v-html="tips"></div>
           </template>
         </el-upload>
-        <div class="managers">
+        <div class="managers flex-space flex-items-center flex-wrap">
           <el-button plain :icon="Search" @click="configDialog = true">查看数据</el-button>
           <el-button plain :icon="Minus" @click="reloadRemark">清除备注</el-button>
           <el-button plain :icon="Close" @click="reloadTag">清除标签</el-button>
@@ -308,58 +308,37 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
 <style scoped>
 .container {
   height: 100vh;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
 }
 
 .tooltip {
   cursor: pointer;
 }
 
-.edit-title {
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
-}
-
-.right {
+.sidebar {
+  width: 28%;
   padding: 0 20px;
   box-sizing: border-box;
-  width: 28%;
 }
 
-.middle {
+.content {
   width: 70%;
   padding: 10px;
   box-sizing: border-box;
 }
 
-.middle > h1 {
+.content > h1 {
   margin: 0;
-  padding: 10px 0;
-  box-sizing: border-box;
-  height: 10%;
+  height: 15%;
   text-align: center;
+  box-sizing: border-box;
 }
 
-.random {
-  height: 87%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
+.stage {
+  height: 85%;
 }
 
 .managers {
   margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-content: center;
-  align-items: center;
 }
 
 .managers > button {
@@ -368,16 +347,10 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
 }
 
 .student {
-  padding: 10px;
-  box-sizing: border-box;
   width: 110px;
   height: 110px;
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: column;
-  align-content: center;
-  justify-content: center;
-  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .student > div {
