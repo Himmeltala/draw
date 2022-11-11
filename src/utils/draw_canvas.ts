@@ -62,6 +62,22 @@ export class CanvasApp {
     this.data = data;
   }
 
+  get getTimer() {
+    return this.timer;
+  }
+
+  set setTimer(timer: any) {
+    this.timer = timer;
+  }
+
+  get getSpeed() {
+    return this.speed;
+  }
+
+  set setSpeed(speed: number) {
+    this.speed = speed;
+  }
+
   create() {
     this.theCanvas = document.querySelector(this.selector);
     this.context = this.theCanvas.getContext("2d");

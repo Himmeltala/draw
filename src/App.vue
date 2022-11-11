@@ -19,6 +19,8 @@ function inspectData(xlsx: any) {
 
 const stage = ref<any>(null);
 const canvas = ref<any>(null);
+let canvasApp = new CanvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
+let speed = ref(0.3);
 
 onMounted(() => {
   inspectData(xlsx.value);
@@ -31,9 +33,8 @@ onMounted(() => {
   canvas.value.height = stage.value.clientHeight;
   canvas.value.width = stage.value.clientWidth;
 
-  let c = new CanvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
-  c.create();
-  c.init();
+  canvasApp.create();
+  canvasApp.init();
 });
 
 const upload = ref<UploadInstance>();
@@ -91,17 +92,24 @@ let interval = 0;
 let stochastic = ref<any[]>([]);
 
 const start = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      interval = setInterval(() => {
-        stochastic.value = [];
-        for (let i = 0; i < configFormData.max; i++) stochastic.value.push(xlsx.value[Math.floor(Math.random() * xlsx.value.length)]);
-      }, configFormData.rate);
-      disabledStart.value = true;
-      disabledClose.value = false;
-    } else ElMessage.error("请确认表单信息填写完整！");
-  });
+  // if (!formEl) return;
+  // await formEl.validate((valid, fields) => {
+  //   if (valid) {
+  //     interval = setInterval(() => {
+  //       stochastic.value = [];
+  //       for (let i = 0; i < configFormData.max; i++) stochastic.value.push(xlsx.value[Math.floor(Math.random() * xlsx.value.length)]);
+  //     }, configFormData.rate);
+  //     disabledStart.value = true;
+  //     disabledClose.value = false;
+  //   } else ElMessage.error("请确认表单信息填写完整！");
+  // });
+  canvasApp.setSpeed = speed.value;
+  clearInterval(canvasApp.getTimer);
+  canvasApp.setTimer(
+    setInterval(() => {
+      canvasApp.onTimer();
+    }, 10 / 24)
+  );
 };
 
 function close() {
@@ -227,7 +235,7 @@ let title = useStorage<any>("title", "点击修改本次活动标题");
             <el-input-number controls-position="right" v-model="configFormData.max" :min="1" :max="copyXlsx.length" />
           </el-form-item>
           <el-form-item label="随机速率">
-            <el-slider :min="120" :max="300" :step="10" size="small" input-size="small" v-model="configFormData.rate" />
+            <el-slider :min="0.1" :max="20" :step="0.1" size="small" input-size="small" v-model="speed" />
           </el-form-item>
           <el-form-item label="文字大小">
             <el-slider :min="14" :max="30" :step="1" size="small" input-size="small" v-model="configFormData.size" />
