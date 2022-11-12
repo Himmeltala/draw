@@ -22,7 +22,7 @@ function inspectData(xlsx: any) {
 const stage = ref<any>(null);
 const canvas = ref<any>(null);
 let canvasApp = new CanvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
-let speed = ref(1);
+let speed = ref(10);
 
 onMounted(() => {
   inspectData(xlsx.value);
