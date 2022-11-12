@@ -14,18 +14,9 @@ let xlsx = useStorage<any>("xlsx-data", []);
 let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
 let tips = ref("");
 
-let initTime = ref(0);
-
 function inspectData(xlsx: any) {
   if (xlsx.length > 0) {
     tips.value = `<span>你已经导入表格，点击查看数据</span>`;
-    if (initTime.value > 0 && xlsx.value?.length) {
-      ElMessage.success({
-        message: "导入数据成功，请刷新页面再继续！",
-        type: "success",
-        duration: 5000
-      });
-    }
     disabledStart.value = false;
     disabledClose.value = true;
   } else {
@@ -45,7 +36,6 @@ onMounted(() => {
   watch(
     () => xlsx.value,
     (newValue, oldValue) => {
-      initTime.value++;
       inspectData(newValue);
     },
     { deep: true }
@@ -67,8 +57,14 @@ const handleExceed: UploadProps["onExceed"] = files => {
 
 const onChange: UploadProps["onChange"] = file => {
   let fileType = file.raw?.type;
-  if (fileType == FileType.XLS || fileType == FileType.XLSX) importXlsx(file, xlsx);
-  else ElMessage.error("文件类型只能是 XLSX 或 XLS!");
+  if (fileType == FileType.XLS || fileType == FileType.XLSX) {
+    importXlsx(file, xlsx);
+    ElMessage.success({
+      message: "导入数据成功，请刷新页面再继续！",
+      type: "success",
+      duration: 5000
+    });
+  } else ElMessage.error("文件类型只能是 XLSX 或 XLS!");
 };
 
 let configDialog = ref(false);
