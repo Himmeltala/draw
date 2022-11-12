@@ -202,11 +202,11 @@ export class CanvasApp {
       }
 
       /*
-            We are doing two things here to calculate display coordinates.
-            The whole display is being rotated around a vertical axis, so we first calculate rotated coordinates for
-            x and z (but the y coordinate will not change).
-            Then, we take the new coordinates (rotX, y, rotZ), and project these onto the 2D view plane.
-            */
+        We are doing two things here to calculate display coordinates.
+        The whole display is being rotated around a vertical axis, so we first calculate rotated coordinates for
+        x and z (but the y coordinate will not change).
+        Then, we take the new coordinates (rotX, y, rotZ), and project these onto the 2D view plane.
+      */
       this.rotX = this.cosAngle * p.x + this.sinAngle * (p.z - this.sphereCenterZ);
       this.rotZ = -this.sinAngle * p.x + this.cosAngle * (p.z - this.sphereCenterZ) + this.sphereCenterZ;
       this.m = (this.radius_sp * this.fLen) / (this.fLen - this.rotZ);

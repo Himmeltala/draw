@@ -14,9 +14,25 @@ let xlsx = useStorage<any>("xlsx-data", []);
 let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
 let tips = ref("");
 
+let initTime = ref(0);
+
 function inspectData(xlsx: any) {
-  if (xlsx.length > 0) tips.value = `<span>你已经导入表格，点击查看数据</span>`;
-  else tips.value = `<span class="text-red">你没有导入表格，点击上传文件</span>`;
+  if (xlsx.length > 0) {
+    tips.value = `<span>你已经导入表格，点击查看数据</span>`;
+    if (initTime.value > 0 && xlsx.value?.length) {
+      ElMessage.success({
+        message: "导入数据成功，请刷新页面再继续！",
+        type: "success",
+        duration: 5000
+      });
+    }
+    disabledStart.value = false;
+    disabledClose.value = true;
+  } else {
+    tips.value = `<span class="text-red">你没有导入表格，点击上传文件</span>`;
+    disabledStart.value = true;
+    disabledClose.value = true;
+  }
 }
 
 const stage = ref<any>(null);
@@ -28,7 +44,10 @@ onMounted(() => {
   inspectData(xlsx.value);
   watch(
     () => xlsx.value,
-    (newValue, oldValue) => inspectData(newValue),
+    (newValue, oldValue) => {
+      initTime.value++;
+      inspectData(newValue);
+    },
     { deep: true }
   );
 
