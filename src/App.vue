@@ -7,6 +7,8 @@ import { Search, Upload, Delete, Minus, Download, Close, SuccessFilled } from "@
 import { importXlsx, exportXlsx, FileType } from "./utils/xlsx";
 import { Extract } from "./utils/extract";
 import { CanvasApp } from "./utils/draw_canvas";
+import dc from "./assets/drawing-complete.wav";
+import d from "./assets/drawing.wav";
 
 let xlsx = useStorage<any>("xlsx-data", []);
 let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
@@ -95,6 +97,9 @@ const start = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
+      audio.value.src = d;
+      audio.value.loop = true;
+      audio.value.play();
       canvasApp.setSpeed = speed.value;
       clearInterval(canvasApp.getTimer);
       canvasApp.setTimer = setInterval(() => {
@@ -133,6 +138,10 @@ function close() {
   }, 10 / 24);
 
   drawDialog.value = !drawDialog.value;
+  audio.value.pause();
+  audio.value.src = dc;
+  audio.value.loop = false;
+  audio.value.play();
   disabledStart.value = false;
   disabledClose.value = true;
 }
@@ -180,10 +189,18 @@ let isEditedTitle = ref(false);
 let title = useStorage<any>("title", "点击修改本次活动标题");
 
 let drawDialog = ref(false);
+let audioSrc = ref(dc);
+let audio = ref<any>(null);
+
+function over() {
+  drawDialog.value = !drawDialog.value;
+  audio.value.pause();
+}
 </script>
 
 <template>
   <div class="container flex-space">
+    <audio ref="audio" loop="true" :src="audioSrc" />
     <div class="content">
       <template v-if="!isEditedTitle">
         <h1 @click="isEditedTitle = !isEditedTitle">{{ title }}</h1>
@@ -195,17 +212,8 @@ let drawDialog = ref(false);
         </h1>
       </template>
       <div ref="stage" id="stage" class="stage flex-center flex-items-center flex-wrap">
-        <!-- <div
-          v-for="(item, index) in stochastic"
-          :key="index"
-          class="student flex-center flex-items-center flex-nowrap flex-col"
-          :style="{ 'font-size': configFormData.size + 'px', width: configFormData.size * 9 + 'px', height: configFormData.size * 9 + 'px' }">
-          <Avatar />
-          <div class="compellation">{{ item["姓名"] }}</div>
-          <div class="dientifier">{{ item["学号"] }}</div>
-        </div> -->
         <canvas id="canvas-2d" ref="canvas" />
-        <el-dialog v-model="drawDialog" title="谁是幸运儿？" width="30%" align-center>
+        <el-dialog v-model="drawDialog" :title="'本次 ' + configFormData.remark + ' 结果'" width="30%" align-center>
           <div class="student flex-center flex-items-center flex-wrap flex-row">
             <div v-for="(item, index) in stochastic" :key="index" :style="{ 'font-size': configFormData.size + 'px', width: configFormData.size * 9 + 'px', height: configFormData.size * 9 + 'px' }">
               <Avatar />
@@ -215,8 +223,8 @@ let drawDialog = ref(false);
           </div>
           <template #footer>
             <span class="dialog-footer">
-              <el-button @click="drawDialog = false">取消</el-button>
-              <el-button type="primary" @click="drawDialog = false">再来</el-button>
+              <el-button @click="over">取消</el-button>
+              <el-button type="primary" @click="over">再来</el-button>
             </span>
           </template>
         </el-dialog>
@@ -256,7 +264,7 @@ let drawDialog = ref(false);
             <el-input-number controls-position="right" v-model="configFormData.max" :min="1" :max="copyXlsx.length" />
           </el-form-item>
           <el-form-item label="随机速率">
-            <el-slider :min="0.1" :max="20" :step="0.1" size="small" input-size="small" v-model="speed" />
+            <el-slider :min="0.5" :max="20" :step="0.5" size="small" input-size="small" v-model="speed" />
           </el-form-item>
           <el-form-item label="文字大小">
             <el-slider :min="14" :max="30" :step="1" size="small" input-size="small" v-model="configFormData.size" />
