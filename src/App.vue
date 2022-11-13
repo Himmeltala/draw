@@ -7,8 +7,8 @@ import { Search, Upload, Delete, Minus, Download, Close, SuccessFilled } from "@
 import { importXlsx, exportXlsx, FileType } from "./utils/xlsx";
 import { Extract } from "./utils/extract";
 import { CanvasApp } from "./utils/draw_canvas";
-import dc from "./assets/drawing-complete.wav";
-import d from "./assets/drawing.wav";
+import beginBg from "./assets/begin-bg.mp3";
+import endBg from "./assets/end-bg.mp3";
 
 let xlsx = useStorage<any>("xlsx-data", []);
 let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
@@ -112,7 +112,7 @@ const start = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      audio.value.src = d;
+      audio.value.src = beginBg;
       audio.value.loop = true;
       audio.value.play();
       canvasApp.setSpeed = speed.value;
@@ -154,7 +154,7 @@ function close() {
 
   drawDialog.value = !drawDialog.value;
   audio.value.pause();
-  audio.value.src = dc;
+  audio.value.src = endBg;
   audio.value.loop = false;
   audio.value.play();
   disabledStart.value = false;
@@ -204,7 +204,7 @@ let isEditedTitle = ref(false);
 let title = useStorage<any>("title", "点击修改本次活动标题");
 
 let drawDialog = ref(false);
-let audioSrc = ref(dc);
+let audioSrc = ref(endBg);
 let audio = ref<any>(null);
 
 function over() {
