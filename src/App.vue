@@ -218,7 +218,7 @@ function over() {
     <audio ref="audio" loop="true" :src="audioSrc" />
     <div class="content">
       <template v-if="!isEditedTitle">
-        <h1 @click="isEditedTitle = !isEditedTitle">{{ title }}</h1>
+        <h1 class="title flex-center flex-items-center" @click="isEditedTitle = !isEditedTitle">{{ title }}</h1>
       </template>
       <template v-else>
         <h1 class="title flex-center flex-items-center">
@@ -250,7 +250,7 @@ function over() {
         <h3>
           <span>数据管理</span>
           <el-tooltip class="tooltip" effect="dark" content="遇到问题？点击查看文档" placement="top-start">
-            <el-link href="https://gitee.com/Enziandom/gadget-webrandom#%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E" class="mg-l-10" target="_blank">遇到问题</el-link>
+            <el-link href="https://gitee.com/Enziandom/gadget-webrandom#%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E" class="mg-l-10" target="_blank">遇到问题?</el-link>
           </el-tooltip>
         </h3>
         <el-upload ref="upload" :limit="1" :on-change="onChange" :on-exceed="handleExceed" :auto-upload="false">
@@ -392,13 +392,13 @@ function over() {
 
 .content > h1 {
   margin: 0;
-  height: 15%;
+  height: 10%;
   text-align: center;
   box-sizing: border-box;
 }
 
 .stage {
-  height: 85%;
+  height: 90%;
 }
 
 .managers {
