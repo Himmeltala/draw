@@ -10,42 +10,43 @@ import { CanvasApp } from "./utils/draw_canvas";
 import beginBg from "./assets/begin-bg.mp3";
 import endBg from "./assets/end-bg.mp3";
 
-let xlsx = useStorage<any>("xlsx-data", []);
-let copyXlsx = ref(JSON.parse(JSON.stringify(xlsx.value)));
-let tips = ref("");
-
-function inspectData(xlsx: any) {
-  if (xlsx.length > 0) {
-    tips.value = `<span>你已经导入表格，点击查看数据</span>`;
-    disabledStart.value = false;
-    disabledClose.value = true;
-  } else {
-    tips.value = `<span class="text-red">你没有导入表格，点击上传文件</span>`;
-    disabledStart.value = true;
-    disabledClose.value = true;
-  }
-}
+const xlsxLocalStoreage = useStorage<any>("xlsx-data", []);
+const copyXlsx = ref(JSON.parse(JSON.stringify(xlsxLocalStoreage.value)));
+const xlsxImportedTip = ref("");
 
 const stage = ref<any>(null);
 const canvas = ref<any>(null);
-let canvasApp = new CanvasApp("#canvas-2d", 500, 0.3, 1, false, xlsx.value);
-let speed = ref(10);
+const canvasApp = new CanvasApp("#canvas-2d", 500, 0.3, 1, false);
+const speed = ref(10);
+
+function checkXlsxIsImported(xlsx: any) {
+  if (xlsx.length > 0) {
+    xlsxImportedTip.value = `<span>你已经导入表格，点击查看数据</span>`;
+    disabledStart.value = false;
+    disabledClose.value = true;
+    canvasApp.setData = xlsxLocalStoreage.value;
+    canvas.value.height = stage.value.clientHeight;
+    canvas.value.width = stage.value.clientWidth;
+    canvasApp.create();
+    canvasApp.init();
+    return true;
+  } else {
+    xlsxImportedTip.value = `<span class="text-red">你没有导入表格，点击上传文件</span>`;
+    disabledStart.value = true;
+    disabledClose.value = true;
+    return false;
+  }
+}
 
 onMounted(() => {
-  inspectData(xlsx.value);
+  checkXlsxIsImported(xlsxLocalStoreage.value);
   watch(
-    () => xlsx.value,
-    (newValue, oldValue) => {
-      inspectData(newValue);
+    () => xlsxLocalStoreage.value,
+    updatedXlsx => {
+      checkXlsxIsImported(updatedXlsx);
     },
     { deep: true }
   );
-
-  canvas.value.height = stage.value.clientHeight;
-  canvas.value.width = stage.value.clientWidth;
-
-  canvasApp.create();
-  canvasApp.init();
 });
 
 const upload = ref<UploadInstance>();
@@ -55,10 +56,10 @@ const handleExceed: UploadProps["onExceed"] = files => {
   upload.value!.handleStart(files[0] as UploadRawFile);
 };
 
-const onChange: UploadProps["onChange"] = file => {
-  let fileType = file.raw?.type;
+const onChange: UploadProps["onChange"] = async file => {
+  const fileType = file.raw?.type;
   if (fileType == FileType.XLS || fileType == FileType.XLSX) {
-    importXlsx(file, xlsx);
+    await importXlsx(file, xlsxLocalStoreage);
     ElMessage.success({
       message: "导入数据成功，请刷新页面再继续！",
       type: "success",
@@ -67,23 +68,23 @@ const onChange: UploadProps["onChange"] = file => {
   } else ElMessage.error("文件类型只能是 XLSX 或 XLS!");
 };
 
-let configDialog = ref(false);
-let exportXlsxDialog = ref(false);
+const configDialog = ref(false);
+const exportXlsxDialog = ref(false);
 
-let configFormData = reactive<any>({
+const configFormData = reactive<any>({
   remark: "",
   max: 1,
   rate: 120,
   size: 14
 });
 
-let exportFormData = ref({
+const exportFormData = ref({
   filename: "",
   sheetName: ""
 });
 
-let disabledStart = ref(false);
-let disabledClose = ref(true);
+const disabledStart = ref(false);
+const disabledClose = ref(true);
 
 const configFormRef = ref<FormInstance>();
 const configRules = reactive<FormRules>({
@@ -106,7 +107,7 @@ const exportRules = reactive<FormRules>({
 });
 
 let interval = 0;
-let stochastic = ref<any[]>([]);
+const stochastic = ref<any[]>([]);
 
 const start = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
@@ -121,7 +122,7 @@ const start = async (formEl: FormInstance | undefined) => {
         canvasApp.onTimer();
       }, 10 / 24);
       stochastic.value = [];
-      for (let i = 0; i < configFormData.max; i++) stochastic.value.push(xlsx.value[Math.floor(Math.random() * xlsx.value.length)]);
+      for (let i = 0; i < configFormData.max; i++) stochastic.value.push(xlsxLocalStoreage.value[Math.floor(Math.random() * xlsxLocalStoreage.value.length)]);
       disabledStart.value = true;
       disabledClose.value = false;
     } else ElMessage.error("请确认表单信息填写完整！");
@@ -130,13 +131,13 @@ const start = async (formEl: FormInstance | undefined) => {
 
 function close() {
   if (interval != 0) clearInterval(interval);
-  copyXlsx.value = JSON.parse(JSON.stringify(xlsx.value));
+  copyXlsx.value = JSON.parse(JSON.stringify(xlsxLocalStoreage.value));
   let random = new Extract(copyXlsx.value, configFormData).random();
   stochastic.value = [];
   for (let i = 0; i < random.length; i++) {
-    for (let j = 0; j < xlsx.value.length; j++) {
-      if (copyXlsx.value[random[i]].学号 === xlsx.value[j].学号) {
-        let obj = xlsx.value[j];
+    for (let j = 0; j < xlsxLocalStoreage.value.length; j++) {
+      if (copyXlsx.value[random[i]].学号 === xlsxLocalStoreage.value[j].学号) {
+        let obj = xlsxLocalStoreage.value[j];
         if (!obj["备注"]) obj["备注"] = "";
         if (!obj["标签"]) obj["标签"] = "";
         obj["标签"] = true;
@@ -145,13 +146,11 @@ function close() {
       }
     }
   }
-
   canvasApp.setSpeed = 0.3;
   clearInterval(canvasApp.getTimer);
   canvasApp.setTimer = setInterval(() => {
     canvasApp.onTimer();
   }, 10 / 24);
-
   drawDialog.value = !drawDialog.value;
   audio.value.pause();
   audio.value.src = endBg;
@@ -161,8 +160,8 @@ function close() {
   disabledClose.value = true;
 }
 
-let editIndex = ref(-1);
-let isEdit = ref(false);
+const editIndex = ref(-1);
+const isEdit = ref(false);
 
 function handleEdit(index: any, row: any) {
   editIndex.value = index;
@@ -175,18 +174,18 @@ function handleEditComplete() {
 }
 
 function handleDelete(index: any, row: any) {
-  xlsx.value.splice(index, 1);
+  xlsxLocalStoreage.value.splice(index, 1);
 }
 
 function reloadRemark() {
-  for (let i = 0; i < xlsx.value.length; i++) {
-    xlsx.value[i]["备注"] = "";
+  for (let i = 0; i < xlsxLocalStoreage.value.length; i++) {
+    xlsxLocalStoreage.value[i]["备注"] = "";
   }
 }
 
 function reloadTag() {
-  for (let i = 0; i < xlsx.value.length; i++) {
-    xlsx.value[i]["标签"] = "";
+  for (let i = 0; i < xlsxLocalStoreage.value.length; i++) {
+    xlsxLocalStoreage.value[i]["标签"] = "";
   }
 }
 
@@ -194,18 +193,18 @@ const exportData = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      exportXlsx(xlsx.value, exportFormData.value.filename + ".xlsx", exportFormData.value.sheetName);
+      exportXlsx(xlsxLocalStoreage.value, exportFormData.value.filename + ".xlsx", exportFormData.value.sheetName);
       exportXlsxDialog.value = !exportXlsxDialog.value;
     } else ElMessage.error("请确认表单信息填写完整！");
   });
 };
 
-let isEditedTitle = ref(false);
-let title = useStorage<any>("title", "点击修改本次活动标题");
+const isEditedTitle = ref(false);
+const title = useStorage<any>("title", "点击修改本次活动标题");
 
-let drawDialog = ref(false);
-let audioSrc = ref(endBg);
-let audio = ref<any>(null);
+const drawDialog = ref(false);
+const audioSrc = ref(endBg);
+const audio = ref<any>(null);
 
 function over() {
   drawDialog.value = !drawDialog.value;
@@ -250,7 +249,7 @@ function over() {
         <h3>
           <span>数据管理</span>
           <el-tooltip class="tooltip" effect="dark" content="遇到问题？点击查看文档" placement="top-start">
-            <el-link href="https://gitee.com/Enziandom/gadget-webrandom#%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E" class="mg-l-10" target="_blank">遇到问题?</el-link>
+            <el-link href="https://gitee.com/Himmelbleu/luck-draw#%E9%A1%B9%E7%9B%AE%E8%AF%B4%E6%98%8E" class="mg-l-10" target="_blank">遇到问题?</el-link>
           </el-tooltip>
         </h3>
         <el-upload ref="upload" :limit="1" :on-change="onChange" :on-exceed="handleExceed" :auto-upload="false">
@@ -258,14 +257,14 @@ function over() {
             <el-button class="mg-r-10" plain type="primary" :icon="Upload">上传文件</el-button>
           </template>
           <template #tip>
-            <div class="el-upload__tip" v-html="tips"></div>
+            <div class="el-upload__tip" v-html="xlsxImportedTip"></div>
           </template>
         </el-upload>
         <div class="managers flex-space flex-items-center flex-wrap">
           <el-button plain :icon="Search" @click="configDialog = true">查看数据</el-button>
           <el-button plain :icon="Minus" @click="reloadRemark">清除备注</el-button>
           <el-button plain :icon="Close" @click="reloadTag">清除标签</el-button>
-          <el-button plain :icon="Delete" @click="xlsx = []" type="danger">清除数据</el-button>
+          <el-button plain :icon="Delete" @click="xlsxLocalStoreage = []" type="danger">清除数据</el-button>
           <el-button plain :icon="Download" @click="exportXlsxDialog = !exportXlsxDialog" type="success">导出数据</el-button>
         </div>
       </div>
@@ -276,7 +275,7 @@ function over() {
             <el-input v-model="configFormData.remark" placeholder="一等奖、二等奖、上台表演等" />
           </el-form-item>
           <el-form-item label="抽取人数">
-            <el-input-number controls-position="right" v-model="configFormData.max" :min="1" :max="copyXlsx.length" />
+            <el-input-number controls-position="right" v-model="configFormData.max" :min="1" :max="copyXlsx.length || 2" />
           </el-form-item>
           <el-form-item label="随机速率">
             <el-slider :min="0.5" :max="20" :step="0.5" size="small" input-size="small" v-model="speed" />
@@ -293,7 +292,7 @@ function over() {
       </div>
     </div>
     <el-dialog v-model="configDialog" title="导入的数据" width="50%">
-      <el-table :data="xlsx" stripe style="width: 100%">
+      <el-table :data="xlsxLocalStoreage" stripe style="width: 100%">
         <el-table-column prop="学号" label="学号">
           <template #default="scope">
             <template v-if="scope.$index === editIndex && isEdit">
@@ -369,7 +368,7 @@ function over() {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="css">
 .container {
   height: 100vh;
 }

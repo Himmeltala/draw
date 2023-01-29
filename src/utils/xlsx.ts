@@ -10,7 +10,6 @@ export function exportXlsx(data: any, file: string, ...sheets: string[]) {
 export async function importXlsx(file: UploadFile, xlsx: any) {
   const wb = read(await file.raw?.arrayBuffer());
   xlsx.value = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-  console.log(xlsx.value);
 }
 
 export enum FileType {

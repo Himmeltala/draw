@@ -6,7 +6,7 @@ export class CanvasApp {
   private speed: number;
   private radius_sp: number;
   private opt_display_dots: boolean;
-  private data: any[];
+  private data?: any[];
 
   private displayWidth: any;
   private displayHeight: any;
@@ -53,13 +53,20 @@ export class CanvasApp {
   private y0: any;
   private z0: any;
 
-  constructor(selector: string, sphereRad: number, speed: number, radius_sp: number, opt_display_dots: boolean, data: any[]) {
+  constructor(selector: string, sphereRad: number, speed: number, radius_sp: number, opt_display_dots: boolean) {
     this.selector = selector;
     this.sphereRad = sphereRad;
     this.speed = speed;
     this.radius_sp = radius_sp;
     this.opt_display_dots = opt_display_dots;
+  }
+
+  set setData(data: any[]) {
     this.data = data;
+  }
+
+  get getData() {
+    return this.data;
   }
 
   get getTimer() {
@@ -305,7 +312,10 @@ export class CanvasApp {
     newParticle.age = 0;
     newParticle.dead = false;
 
-    newParticle.flake = this.data[Math.floor(Math.random() * this.data.length)].姓名;
+    if (this.data) {
+      newParticle.flake = this.data[Math.floor(Math.random() * this.data.length)].姓名;
+    }
+
     if (Math.random() < 0.5) {
       newParticle.right = true;
     } else {
