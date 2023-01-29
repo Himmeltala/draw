@@ -275,7 +275,7 @@ function over() {
             <el-input v-model="configFormData.remark" placeholder="一等奖、二等奖、上台表演等" />
           </el-form-item>
           <el-form-item label="抽取人数">
-            <el-input-number controls-position="right" v-model="configFormData.max" :min="1" :max="copyXlsx.length || 2" />
+            <el-input-number controls-position="right" v-model="configFormData.max" :min="1" :max="xlsxLocalStoreage.length || 2" />
           </el-form-item>
           <el-form-item label="随机速率">
             <el-slider :min="0.5" :max="20" :step="0.5" size="small" input-size="small" v-model="speed" />
