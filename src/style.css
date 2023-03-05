@@ -5,6 +5,14 @@
   background-color: #242424;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+button {
+  margin-left: 0 !important;
+}
+
 :root,
 #app,
 body {

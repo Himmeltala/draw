@@ -16,7 +16,7 @@
 
 # 运行项目
 
-快速预览：https://himmelbleu.gitee.io/luck-draw
+快速预览：https://himmeltala.github.io/draw/dist/
 
 推荐克隆本仓库到本地，进入根目录执行以下指令：
 

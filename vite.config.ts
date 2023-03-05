@@ -5,14 +5,16 @@ import Components from "unplugin-vue-components/vite";
 import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
 
 export default defineConfig({
-  base: "/luck-draw/",
+  base: "/draw/dist",
   plugins: [
     vue(),
     AutoImport({
+      imports: ["vue", "vue-router", "@vueuse/core"],
       resolvers: [ElementPlusResolver()]
     }),
     Components({
-      resolvers: [ElementPlusResolver()]
+      resolvers: [ElementPlusResolver()],
+      dirs: ["./src/fragments/**", "./src/components/**"]
     })
   ]
 });
